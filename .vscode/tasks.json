@@ -7,6 +7,10 @@
             "args": [
                 "-g",
                 "-Wall",                // Generate all warnings
+                "-I",
+                "/opt/homebrew/Cellar/boost/1.81.0_1/include",
+                "-I",
+                "/opt/homebrew/Cellar/asio/1.28.0/include",
                 "${fileDirname}/*.cpp", // Compile all cpps in folder
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
