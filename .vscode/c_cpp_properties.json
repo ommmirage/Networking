@@ -3,11 +3,14 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/opt/homebrew/Cellar/boost/1.81.0_1/include",
+                "/opt/homebrew/Cellar/asio/1.28.0/include",
             ],
             "defines": [],
             "macFrameworkPath": [
-                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks",
+                "/opt/homebrew/Cellar"
             ],
             "compilerPath": "/usr/bin/g++",
             "cStandard": "c17",
