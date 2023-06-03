@@ -4,7 +4,10 @@
 #include <asio/ts/buffer.hpp>
 #include <asio/ts/internet.hpp>
 
-std::vector<char> vBuffer(20 * 1024);
+#include <chrono>
+#include <thread>
+
+std::vector<char> vBuffer(1024);
 
 void GrabSomeData(asio::ip::tcp::socket& socket)
 {
@@ -33,6 +36,18 @@ int main()
     // Create a context - essentially the platform specific interface
     asio::io_context context;
 
+    // We are loading the context with instructions with witch the context has to wait
+    // for certain conditions. And then it will execute code associated with those instructions.
+
+    // Give some fake tasks to asio so the context doesn't finish before it got real job.
+    asio::io_context::work idleWork(context);
+
+    // We run the context in its own thread. This gives the context some temporal space
+    // within which it can execute this instructions without blocking main program.
+    // Context.run() will return as soon as context is run out of things to do, a.i.
+    // there are no instructions registered with context to do in the future
+    std::thread thrContext = std::thread([&]() { context.run(); });
+
     // Get the address of somewhere we wish to connect to
     asio::ip::tcp::endpoint endpoint(asio::ip::make_address("93.184.216.34", ec), 80);
 
@@ -53,6 +68,8 @@ int main()
 
     if (socket.is_open())
     {
+        GrabSomeData(socket);
+
         std::string sRequest =
             "GET /index.html HTTP/1.1\r\n"
             "Host: example.com\r\n"
@@ -60,6 +77,6 @@ int main()
 
         socket.write_some(asio::buffer(sRequest.data(), sRequest.size()), ec);
 
-        GrabSomeData(socket);
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
 }
