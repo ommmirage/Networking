@@ -1,2 +1,5 @@
 main
 main.dSYM/Contents/Info.plist
+.vscode/settings.json
+NetClient/client
+NetClient/client.dSYM/Contents/Info.plist
