@@ -60,23 +60,23 @@ public:
                 {
                     std::cout << "[SERVER] New connection: " << socket.remote_endpoint() << "\n";
 
-                    // std::shared_ptr<connection> newConnection =
-                    //     std::make_shared<connection>(connection::owner::server,
-                    //         asioContext, socket, qMessagesIn);
+                    std::shared_ptr<connection> newConnection =
+                        std::make_shared<connection>(connection::owner::server,
+                            asioContext, std::move(socket), qMessagesIn);
 
-                    // if (OnClientConnect(newConnection))
-                    // {
-                    //     // Connection allowed, so add to container of new connections
-                    //     deqConnections.push_back(newConnection);
+                    if (OnClientConnect(newConnection))
+                    {
+                        // Connection allowed, so add to container of new connections
+                        deqConnections.push_back(newConnection);
 
-                    //     deqConnections.back()->ConnectToClient(nIDCounter++);
+                        deqConnections.back()->ConnectToClient(nIDCounter++);
 
-                    //     std::cout << "[" << deqConnections.back()->id << "] connection approved\n";
-                    // }
-                    // else
-                    // {
-                    //     std::cout << "[------] Conncetion denied\n";
-                    // }
+                        std::cout << "[" << deqConnections.back()->id << "] connection approved\n";
+                    }
+                    else
+                    {
+                        std::cout << "[------] Conncetion denied\n";
+                    }
                 }
                 else
                 {

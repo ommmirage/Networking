@@ -23,13 +23,25 @@ public:
         ownerType = parent;
     }
 
-    void ConnectToClient(uint32_t uid = 0);
+    void ConnectToClient(uint32_t uid = 0)
+    {
+        if (ownerType == owner::server)
+        {
+            if (sock.is_open())
+            {
+                id = uid;
+            }
+        }
+    }
 
     bool ConnectToServer(const asio::ip::tcp::resolver::results_type &endpoints);
 
     bool Send(const message &msg);
 
-    bool IsConnected();
+    bool IsConnected()
+    {
+        return sock.is_open();
+    }
 
     // Each connection has a unique socket to a remote
     asio::ip::tcp::socket sock;
