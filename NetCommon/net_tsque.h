@@ -1,3 +1,4 @@
+#pragma once
 #include "net_common.h"
 
 // Thread-safe queue
