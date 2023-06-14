@@ -6,17 +6,18 @@ template<typename T>
 class tsqueue
 {
 public:
-    std::mutex muxQueue;
-    std::deque<T> deq;
+    tsqueue() = default;
+	tsqueue(const tsqueue<T>&) = delete;
+	virtual ~tsqueue() { clear(); }
 
 public:
-    T front()
+    T& front()
     {
         std::scoped_lock lock(muxQueue);
         return deq.front();
     }
 
-    T back()
+    T& back()
     {
         std::scoped_lock lock(muxQueue);
         return deq.back();
@@ -68,4 +69,8 @@ public:
         deq.pop_back();
         return t;
     }
+
+    protected:
+        std::mutex muxQueue;
+        std::deque<T> deq;
 };

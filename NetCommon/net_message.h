@@ -12,13 +12,13 @@ enum class MsgType : uint32_t
 
 struct message_header
 {
-    MsgType type;
+    MsgType type{};
     uint32_t size = 0;
 };
 
 struct message
 {
-    message_header header;
+    message_header header{};
     std::vector<uint8_t> body;
 };
 
@@ -29,5 +29,4 @@ struct owned_message
 {
     std::shared_ptr<connection> remote = nullptr;
     message msg;
-
 };
