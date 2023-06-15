@@ -27,7 +27,7 @@ public:
 
 int main()
 {
-    CustomServer server(6000);
+    CustomServer server(60000);
     server.Start();
 
     while(1)

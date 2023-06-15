@@ -6,20 +6,35 @@
 
 class client_interface
 {
+public:
     client_interface() : sock(context)
     {
         // Initialise the socket with the io context
     }
+
+    ~client_interface()
+    {
+        Disconnect();
+    }
+
     // Connect to server with hostmane/ip address and port
     bool Connect(const std::string& host, const uint16_t port)
     {
         try
         {
-            conn = std::make_unique<connection>(connection::owner::client, context, asio::ip::tcp::socket(context), qMessagesIn);
-
+            // Resolve hostname/ip-address в ощутимый физический адрес
             asio::ip::tcp::resolver resolver(context);
             asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(host, std::to_string(port));
 
+            // Create coonection
+            conn = std::make_unique<connection>(
+                connection::owner::client,
+                context,
+                asio::ip::tcp::socket(context),
+                qMessagesIn
+            );
+
+            // Tell the connection object to connect to server
             conn->ConnectToServer(endpoints);
 
             thrContext = std::thread([this]() {context.run(); });

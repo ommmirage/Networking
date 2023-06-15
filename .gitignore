@@ -7,3 +7,5 @@ SimpleServer.dSYM/Contents/Info.plist
 NetClient/client.dSYM/Contents/Resources/DWARF/client
 SimpleServer
 main.dSYM/Contents/Resources/DWARF/main
+SimpleClient/SipmleClient
+SimpleClient/SipmleClient.dSYM/Contents/Info.plist

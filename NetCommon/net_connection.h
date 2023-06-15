@@ -17,8 +17,8 @@ public:
 public:
     // Constructor: Specify Owner, connect to context, transfer the socket
     //				Provide reference to incoming message queue
-    connection(owner parent, asio::io_context &asioContext, asio::ip::tcp::socket socket, tsqueue<owned_message> &qIn)
-        : sock(std::move(socket)), m_asioContext(asioContext), qMessagesIn(qIn)
+    connection(owner parent, asio::io_context &m_asioContext, asio::ip::tcp::socket socket, tsqueue<owned_message> &qIn)
+        : sock(std::move(socket)), asioContext(m_asioContext), qMessagesIn(qIn)
     {
         ownerType = parent;
     }
@@ -34,9 +34,20 @@ public:
         }
     }
 
-    bool ConnectToServer(const asio::ip::tcp::resolver::results_type &endpoints);
-
-    bool Send(const message &msg);
+    void Send(const message &msg)
+    {
+        asio::post(asioContext,
+            [this, msg]()
+            {
+                bool bWritingMessage = !qMessagesOut.empty();
+                qMessagesOut.push_back(msg);
+                if (!bWritingMessage)
+                {
+                    WriteHeader();
+                }
+            }
+        );
+    }
 
     // ASYNC - Prime context ready to read a message header
     void ReadHeader()
@@ -159,6 +170,32 @@ public:
         ReadHeader();
     }
 
+    void ConnectToServer(const asio::ip::tcp::resolver::results_type &endpoints)
+    {
+        // Only clients can connect to servers
+        if (ownerType == owner::client)
+        {
+            // Request asio attempts to connect to an endpoint
+            asio::async_connect(sock, endpoints,
+                [this](std::error_code ec, asio::ip::tcp::endpoint endpoint)
+                {
+                    if (!ec)
+                    {
+                        ReadHeader();
+                    }
+                }
+            );
+        }
+    }
+
+    void Disconnect()
+    {
+        if (IsConnected())
+        {
+            asio::post(asioContext, [this]() { sock.close(); });
+        }
+    }
+
     bool IsConnected()
     {
         return sock.is_open();
@@ -168,7 +205,7 @@ public:
     asio::ip::tcp::socket sock;
 
     // This context is shared with the whole asio instance
-    asio::io_context &m_asioContext;
+    asio::io_context &asioContext;
 
     // This queue holds all messages to be sent to the remote side
     // of this connection
