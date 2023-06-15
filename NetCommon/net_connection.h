@@ -30,6 +30,7 @@ public:
             if (sock.is_open())
             {
                 id = uid;
+                ReadHeader();
             }
         }
     }
@@ -47,6 +48,7 @@ public:
                 }
             }
         );
+        // std::cout << "Sent\n";
     }
 
     // ASYNC - Prime context ready to read a message header
@@ -149,6 +151,8 @@ public:
                 }
             }
         );
+        // std::cout << "Wrote body\n";
+
     }
 
     void AddToIncomingMessageQueue()

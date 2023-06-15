@@ -144,6 +144,8 @@ public:
 
             // Pass to message handler
             OnMessage(msg.remote, msg.msg);
+
+            messageCount++;
         }
     }
 

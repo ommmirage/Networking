@@ -18,7 +18,7 @@ public:
     }
 
     // Connect to server with hostmane/ip address and port
-    bool Connect(const std::string& host, const uint16_t port)
+    bool Connect(const std::string &host, const uint16_t port)
     {
         try
         {
@@ -31,31 +31,47 @@ public:
                 connection::owner::client,
                 context,
                 asio::ip::tcp::socket(context),
-                qMessagesIn
-            );
+                qMessagesIn);
 
             // Tell the connection object to connect to server
             conn->ConnectToServer(endpoints);
 
-            thrContext = std::thread([this]() {context.run(); });
+            thrContext = std::thread([this](){ context.run(); });
         }
-        catch(const std::exception& e)
+        catch (const std::exception &e)
         {
             std::cerr << e.what() << '\n';
+            return false;
         }
 
-
-        return false;
+        return true;
     }
 
     void Disconnect()
     {
-
     }
 
     bool IsConnected()
     {
-        return false;
+        if (conn)
+            return true;
+        else
+            return false;
+    }
+
+    // Send message to server
+    void Send(const message &msg)
+    {
+        if (IsConnected())
+        {
+            conn->Send(msg);
+        }
+    }
+
+    // Retrieve queue of messages from server
+    tsqueue<owned_message> &Incoming()
+    {
+        return qMessagesIn;
     }
 
     // asio context handles the data transfer
