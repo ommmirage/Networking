@@ -11,6 +11,10 @@ public:
 
     virtual bool OnClientConnect(std::shared_ptr<connection> client)
     {
+        message msg;
+        msg.header.type = MsgType::ServerAccept;
+        client->Send(msg);
+
         return true;
     }
 
@@ -21,12 +25,11 @@ public:
     // Called when a message arrived
     virtual void OnMessage(std::shared_ptr<connection> client, message& msg)
     {
-        // std::cout << "Message arrived!\n";
         switch (msg.header.type)
         {
             case MsgType::ServerPing:
             {
-                std::cout << "[" << client->id << "]: Server Ping\n";
+                std::cout << "[" << client->id << "] Server Ping\n";
 
                 // Simply bounce message back to client
                 client->Send(msg);

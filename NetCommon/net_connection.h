@@ -48,14 +48,13 @@ public:
                 }
             }
         );
-        // std::cout << "Sent\n";
     }
 
     // ASYNC - Prime context ready to read a message header
     void ReadHeader()
     {
         asio::async_read(sock, asio::buffer(&msgTemporaryIn.header, sizeof(message_header)),
-            [this](std::error_code ec, std::size_t lenght)
+            [this](std::error_code ec, std::size_t length)
             {
                 if (!ec)
                 {
@@ -151,8 +150,6 @@ public:
                 }
             }
         );
-        // std::cout << "Wrote body\n";
-
     }
 
     void AddToIncomingMessageQueue()
@@ -169,7 +166,7 @@ public:
             qMessagesIn.push_back({ nullptr, msgTemporaryIn });
         }
 
-        // AddToIncomingMessageQueue всегда вызывается, когда мы прочти сообщение.
+        // AddToIncomingMessageQueue всегда вызывается, когда мы прочли сообщение.
         // Поэтому мы можем prime asio context with another task to perform
         ReadHeader();
     }
