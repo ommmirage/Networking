@@ -27,6 +27,9 @@ public:
     {
         std::scoped_lock lock(muxQueue);
         deq.push_front(item);
+
+        // Stops blocking thread in wait()
+        cvBlocking.notify_one();
     }
 
     void push_back(const T item)
@@ -34,7 +37,6 @@ public:
         std::scoped_lock lock(muxQueue);
         deq.push_back(item);
 
-        std::unique_lock<std::mutex> ul(mutexBlocking);
         cvBlocking.notify_one();
     }
 
@@ -77,7 +79,7 @@ public:
     {
         while (empty())
         {
-            std::unique_lock<std::mutex> ul(mutexBlocking);
+            std::unique_lock<std::mutex> ul(muxQueue);
             // Sends the thread to sleep until smth signals the condition_variable
             // to wake up
             cvBlocking.wait(ul);
@@ -89,5 +91,4 @@ public:
         std::deque<T> deq;
 
         std::condition_variable cvBlocking;
-        std::mutex mutexBlocking;
 };

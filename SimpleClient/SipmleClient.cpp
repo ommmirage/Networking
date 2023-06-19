@@ -33,9 +33,7 @@ int main()
     CustomClient client;
     client.Connect("127.0.0.1", 60003);
 
-    bool bQuit = false;
-
-    while (!WindowShouldClose() && !bQuit)
+    while (!WindowShouldClose())
     {
         BeginDrawing();
             // ClearBackground(RAYWHITE);
@@ -79,7 +77,7 @@ int main()
         else
         {
             std::cout << "Server Down\n";
-            bQuit = true;
+            CloseWindow();
         }
     }
 

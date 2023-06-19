@@ -136,7 +136,7 @@ public:
     }
 
     // bWait - wait or not for a client to communicate with a server
-    void Update(size_t maxMessages = -1, bool bWait = false)
+    void Update(size_t maxMessages = -1, bool bWait = true)
     {
         if (bWait) qMessagesIn.wait();
 
