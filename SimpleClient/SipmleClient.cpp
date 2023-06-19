@@ -15,26 +15,49 @@ public:
         msg.add(msg, timeNow);
         Send(msg);
     }
+
+    void MessageAll()
+    {
+        message msg;
+        msg.header.type = MsgType::MessageAll;
+        Send(msg);
+    }
 };
 
 int main()
 {
+    InitWindow(32, 32, "raylib [core] example - basic window");
+
+    SetTargetFPS(30);
+
     CustomClient client;
     client.Connect("127.0.0.1", 60003);
 
-    client.PingServer();
-
     bool bQuit = false;
-    while (!bQuit)
+
+    while (!WindowShouldClose() && !bQuit)
     {
+        BeginDrawing();
+            // ClearBackground(RAYWHITE);
+        EndDrawing();
+
         if (client.IsConnected())
         {
+            if (IsKeyPressed(KEY_A)) client.PingServer();
+            if (IsKeyPressed(KEY_S)) client.MessageAll();
+
             if (!client.Incoming().empty())
             {
                 message msg = client.Incoming().pop_front().msg;
 
                 switch (msg.header.type)
                 {
+                    case MsgType::ServerAccept:
+                    {
+                        std::cout << "Server accepted connection\n";
+                    }
+                    break;
+
                     case MsgType::ServerPing:
                     {
                         std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
@@ -44,9 +67,10 @@ int main()
                     }
                     break;
 
-                    case MsgType::ServerAccept:
+                    case MsgType::ServerMessage:
                     {
-                        std::cout << "Server accepted connection\n";
+                        uint32_t client_id = msg.get<uint32_t>(msg);
+                        std::cout << "Message from [" << client_id << "]\n";
                     }
                     break;
                 }
@@ -58,6 +82,8 @@ int main()
             bQuit = true;
         }
     }
+
+    CloseWindow();
 
     return 0;
 }

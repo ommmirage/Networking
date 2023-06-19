@@ -35,6 +35,16 @@ public:
                 client->Send(msg);
             }
             break;
+
+            case MsgType::MessageAll:
+            {
+                std::cout << "[" << client->id << "] Message all\n";
+                message msg;
+                msg.header.type = MsgType::ServerMessage;
+                msg.add(msg, client->id);
+                MessageAllClients(msg, client);
+            }
+            break;
         }
     }
 };

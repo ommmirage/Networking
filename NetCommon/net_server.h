@@ -108,7 +108,7 @@ public:
         }
     }
 
-    void MessageAllClients(message& msg)
+    void MessageAllClients(message& msg, std::shared_ptr<connection> ignoredClient)
     {
         bool bInvalidClientExists = false;
 
@@ -116,7 +116,8 @@ public:
         {
             if (client && client->IsConnected())
             {
-                client -> Send(msg);
+                if (client != ignoredClient)
+                    client -> Send(msg);
             }
             else
             {
