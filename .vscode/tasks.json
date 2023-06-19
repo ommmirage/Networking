@@ -7,11 +7,22 @@
             "args": [
                 "-g",
                 "-Wall",                // Generate all warnings
+                "-framework",
+                "CoreVideo",
+                "-framework",
+                "IOKit",
+                "-framework",
+                "Cocoa",
+                "-framework",
+                "GLUT",
+                "-framework",
+                "OpenGL",
                 "-I",
                 "/opt/homebrew/Cellar/boost/1.81.0_1/include",
                 "-I",
                 "/opt/homebrew/Cellar/asio/1.28.0/include",
                 "-std=c++17",
+                "/Users/sergey/Cpp/Networking/lib/libraylib.a",
                 "${fileDirname}/*.cpp", // Compile all cpps in folder
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"

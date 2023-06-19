@@ -1,11 +1,9 @@
 main.dSYM/Contents/Info.plist
 .vscode/settings.json
-NetClient/client
-NetClient/client.dSYM/Contents/Info.plist
 SimpleServer.dSYM/Contents/Resources/DWARF/SimpleServer
 SimpleServer.dSYM/Contents/Info.plist
-NetClient/client.dSYM/Contents/Resources/DWARF/client
 SimpleServer
 main.dSYM/Contents/Resources/DWARF/main
 SimpleClient/SipmleClient
 SimpleClient/SipmleClient.dSYM/Contents/Info.plist
+SimpleClient/SipmleClient.dSYM/Contents/Resources/DWARF/SipmleClient

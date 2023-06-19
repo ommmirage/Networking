@@ -134,8 +134,11 @@ public:
         }
     }
 
-    void Update(size_t maxMessages = -1)
+    // bWait - wait or not for a client to communicate with a server
+    void Update(size_t maxMessages = -1, bool bWait = false)
     {
+        if (bWait) qMessagesIn.wait();
+
         size_t messageCount = 0;
         while (messageCount < maxMessages && !qMessagesIn.empty())
         {

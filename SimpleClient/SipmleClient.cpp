@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../NetCommon/net.h"
+#include "../NetCommon/raylib.h"
 
 class CustomClient : public client_interface
 {
