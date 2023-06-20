@@ -3,6 +3,8 @@
 #include "net_tsque.h"
 #include "net_message.h"
 
+class server_interface;
+
 class connection : public std::enable_shared_from_this<connection>
 {
 public:
@@ -21,16 +23,28 @@ public:
         : sock(std::move(socket)), asioContext(m_asioContext), qMessagesIn(qIn)
     {
         ownerType = parent;
+
+        // Construct validation check data
+        if (ownerType == owner::server)
+        {
+            // Construct random data for the client to transform and send back
+            handshakeOut = uint64_t(std::chrono::system_clock::now().time_since_epoch().count());
+        }
     }
 
-    void ConnectToClient(uint32_t uid = 0)
+    void ConnectToClient(server_interface* server, uint32_t uid = 0)
     {
         if (ownerType == owner::server)
         {
             if (sock.is_open())
             {
                 id = uid;
-                ReadHeader();
+
+                WriteValidation();
+
+                // Issue a task to wait asynchronously for right validation data
+                // sent back from the client
+                ReadValidation(server);
             }
         }
     }
@@ -171,6 +185,68 @@ public:
         ReadHeader();
     }
 
+    uint64_t encrypt(uint64_t input)
+    {
+        return input * 2;
+    }
+
+    void WriteValidation()
+    {
+        asio::async_write(sock, asio::buffer(&handshakeOut, sizeof(handshakeOut)),
+            [this](std::error_code ec, std::size_t length)
+            {
+                if (!ec)
+                {
+                    if (ownerType == owner::client)
+                    {
+                        ReadHeader();
+                    }
+                }
+                else
+                {
+                    sock.close();
+                }
+            }
+        );
+    }
+
+    void ReadValidation(server_interface* server = nullptr)
+    {
+        asio::async_read(sock, asio::buffer(&handshakeIn, sizeof(handshakeIn)),
+            [this, server](std::error_code ec, std::size_t length)
+            {
+                if (!ec)
+                {
+                    if (ownerType == owner::client)
+                    {
+                        handshakeOut = encrypt(handshakeIn);
+                        WriteValidation();
+                    }
+                    else
+                    {
+                        if (handshakeIn == encrypt(handshakeOut))
+                        {
+                            std::cout << "Client Validated\n";
+                            // server->OnClientValidated(this->shared_from_this());
+
+                            ReadHeader();
+                        }
+                        else
+                        {
+                            std::cout << "Validation failed. Client disconnected\n";
+                            sock.close();
+                        }
+                    }
+                }
+                else
+                {
+                    std::cout << "ReadValidation() failed\n";
+                    sock.close();
+                }
+            }
+        );
+    }
+
     void ConnectToServer(const asio::ip::tcp::resolver::results_type &endpoints)
     {
         // Only clients can connect to servers
@@ -182,7 +258,7 @@ public:
                 {
                     if (!ec)
                     {
-                        ReadHeader();
+                        ReadValidation();
                     }
                 }
             );
@@ -223,4 +299,8 @@ public:
 	owner ownerType = owner::server;
 
     uint32_t id = 0;
+
+    // Handshake validation
+    uint64_t handshakeOut = 0;
+    uint64_t handshakeIn = 0;
 };

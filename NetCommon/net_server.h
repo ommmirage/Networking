@@ -69,7 +69,7 @@ public:
                         // Connection allowed, so add to container of new connections
                         deqConnections.push_back(newConnection);
 
-                        deqConnections.back()->ConnectToClient(nIDCounter++);
+                        deqConnections.back()->ConnectToClient(this, nIDCounter++);
 
                         std::cout << "[" << deqConnections.back()->id << "] connection approved\n";
                     }
@@ -165,7 +165,10 @@ public:
     // Called when a message arrived
     virtual void OnMessage(std::shared_ptr<connection> client, message& msg)
     {
+    }
 
+    virtual void OnClientValidated(std::shared_ptr<connection> client)
+    {
     }
 
     // Thread-safe queue for incoming message packets
